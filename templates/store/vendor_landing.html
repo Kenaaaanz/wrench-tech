@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="vendor-dashboard-container text-center">
+    <h2 class="mb-4">Vendor Portal</h2>
+    <p class="mb-4">Welcome! Please register or log in to manage your vendor account.</p>
+    <a href="{% url 'store:vendor_register' %}" class="btn btn-success btn-lg mx-2">Register as Vendor</a>
+    <a href="{% url 'store:login' %}?next={% url 'store:vendor_dashboard' %}" class="btn btn-primary btn-lg mx-2">Vendor Login</a>
+</div>
+{% endblock %}

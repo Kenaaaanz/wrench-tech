@@ -1,0 +1,66 @@
+/* Dashboard container */
+.vendor-dashboard-container {
+    max-width: 1000px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(60,72,88,0.08);
+    padding: 32px 24px;
+}
+
+/* Section titles */
+.vendor-dashboard-container h2,
+.vendor-dashboard-container h4 {
+    color: #6c63ff;
+    font-weight: 700;
+    margin-bottom: 24px;
+}
+
+/* Tables */
+.vendor-dashboard-container table {
+    background: #f8f9fa;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.vendor-dashboard-container th {
+    background: #6c63ff;
+    color: #fff;
+    font-weight: 600;
+    border: none;
+}
+
+.vendor-dashboard-container td {
+    vertical-align: middle;
+    border-top: 1px solid #e9ecef;
+}
+
+.vendor-dashboard-container tr:last-child td {
+    border-bottom: none;
+}
+
+/* Buttons (if you add edit/delete later) */
+.vendor-dashboard-container .btn {
+    border-radius: 0.4rem;
+    font-size: 0.95rem;
+    padding: 0.35rem 1rem;
+}
+
+.vendor-dashboard-container .btn-primary {
+    background: #6c63ff;
+    border: none;
+}
+
+.vendor-dashboard-container .btn-primary:hover {
+    background: #5548c8;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+    .vendor-dashboard-container {
+        padding: 16px 4px;
+    }
+    .vendor-dashboard-container table {
+        font-size: 0.95rem;
+    }
+}

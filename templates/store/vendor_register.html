@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Vendor Registration</h2>
+    <form method="post" enctype="multipart/form-data" class="mt-4">
+        {% csrf_token %}
+        <div class="mb-3">
+            {{ form.username.label_tag }} {{ form.username }}
+        </div>
+        <div class="mb-3">
+            {{ form.email.label_tag }} {{ form.email }}
+        </div>
+        <div class="mb-3">
+            {{ form.password.label_tag }} {{ form.password }}
+        </div>
+        <div class="mb-3">
+            {{ form.password2.label_tag }} {{ form.password2 }}
+        </div>
+        <div class="mb-3">
+            {{ form.store_name.label_tag }} {{ form.store_name }}
+        </div>
+        <div class="mb-3">
+            {{ form.store_description.label_tag }} {{ form.store_description }}
+        </div>
+        <div class="mb-3">
+            {{ form.logo.label_tag }} {{ form.logo }}
+        </div>
+        <button type="submit" class="btn btn-primary">Register as Vendor</button>
+    </form>
+</div>
+{% endblock %}
