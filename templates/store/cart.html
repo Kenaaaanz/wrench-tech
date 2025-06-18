@@ -225,4 +225,11 @@
             });
         };
     </script>
+    <script>
+        fetch("{% static 'cart/js/countries.json' %}")
+          .then(response => response.json())
+          .then(data => {
+            // Use your country data here
+          });
+    </script>
       {% endblock payment-gateway %}

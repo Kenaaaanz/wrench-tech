@@ -58,6 +58,10 @@
                 <td>{{ order.user.username }}</td>
                 <td>{{ order.quantity }}</td>
                 <td>{{ order.status }}</td>
+                    {% endfor %}
+                  </select>
+                  <span class="status-update-msg text-success small"></span>
+                </td>
                 <td>{{ order.ordered_date|date:"Y-m-d H:i" }}</td>
             </tr>
             {% empty %}
@@ -66,4 +70,35 @@
         </tbody>
     </table>
 </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(function(){
+  $('.status-dropdown').change(function(){
+    var select = $(this);
+    var orderId = select.data('order-id');
+    var status = select.val();
+    var msgSpan = select.siblings('.status-update-msg');
+    $.ajax({
+      url: '/order/' + orderId + '/ajax-update-status/',
+      method: 'POST',
+      data: {
+        status: status,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(response){
+        if(response.success){
+          msgSpan.text('Updated!').removeClass('text-danger').addClass('text-success');
+        } else {
+          msgSpan.text('Error!').removeClass('text-success').addClass('text-danger');
+        }
+        setTimeout(function(){ msgSpan.text(''); }, 2000);
+      },
+      error: function(){
+        msgSpan.text('Server error!').removeClass('text-success').addClass('text-danger');
+        setTimeout(function(){ msgSpan.text(''); }, 2000);
+      }
+    });
+  });
+});
+</script>
 {% endblock %}

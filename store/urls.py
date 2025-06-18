@@ -55,6 +55,11 @@ urlpatterns = [
     path('vendor/orders/', views.vendor_orders, name='vendor_orders'),
     path('<slug:slug>/', views.category_products, name="category-products"),
     path('mpesa/stkpush/', views.mpesa_stk_push, name='mpesa_stk_push'),
-
+    path('vendor/<int:vendor_id>/status/', views.vendor_update_order_status, name='vendor_update_order_status'),
+    path('vendor/stats/', views.vendor_stats, name='vendor_stats'),
+    path('vendor/detailed-stats/', views.vendor_detailed_stats, name='vendor_detailed_stats'),
+    #path('order/<int:order_id>/update-status/', views.vendor_update_order_status, name='update_order_status'),
+    path('order/<int:pk>/ajax-update-status/', views.vendor_update_order_status_ajax, name='vendor_update_order_status_ajax'),
+    path('mpesa/callback/', views.mpesa_callback, name='mpesa_callback'),
 
 ]

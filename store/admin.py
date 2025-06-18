@@ -3,8 +3,8 @@ from .models import Vendor, Address, Category, Product, Cart, Order
 
 @admin.register(Vendor)
 class VendorAdmin(admin.ModelAdmin):
-    list_display = ('store_name', 'user', 'is_approved')
-    list_filter = ('is_approved',)
+    list_display = ('store_name', 'user', 'is_approved', 'shipping_status')
+    list_filter = ('is_approved', 'shipping_status')
     search_fields = ('store_name', 'user__username', 'user__email')
     actions = ['approve_vendors']
 
@@ -46,7 +46,7 @@ class OrderAdmin(admin.ModelAdmin):
     list_editable = ('quantity', 'status')
     list_filter = ('status', 'ordered_date')
     list_per_page = 20
-    search_fields = ('user', 'product')
+    search_fields = ('user__username', 'product__title')
 
 
 admin.site.register(Address, AddressAdmin)
@@ -54,3 +54,4 @@ admin.site.register(Category, CategoryAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Cart, CartAdmin)
 admin.site.register(Order, OrderAdmin)
+

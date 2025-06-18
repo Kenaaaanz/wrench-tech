@@ -1,8 +1,8 @@
-
-
 from pathlib import Path
 
 import os
+import requests
+from requests.auth import HTTPBasicAuth
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -17,7 +17,9 @@ SECRET_KEY = 'django-insecure-3%y3laftm62q0zaj+s7#p-xqq9(&#q+)s8)p-&#&bz*0$!xu$0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+
+#CSRF_TRUSTED_ORIGINS = ['https://wrenchshop.onrender.com']
 
 
 # Application definition
@@ -32,10 +34,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'store',
+    'whitenoise',
+    'mpesa',
+    'mpesa_api',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -71,9 +77,21 @@ WSGI_APPLICATION = 'wrenchshop.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    #'default': {
+        #'ENGINE': 'django.db.backends.sqlite3',
+        #'NAME': BASE_DIR / 'db.sqlite3',
+
+     'default': {
+         #'ENGINE': 'django.db.backends.sqlite3',
+         #'NAME': BASE_DIR / 'db.sqlite3',
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "wrench-tech",
+        "USER": "postgres",
+        "PASSWORD": "Ken@4427",
+        "HOST": "localhost",
+        "PORT": "5432",
+
+
     }
 }
 
@@ -129,8 +147,31 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-MPESA_CONSUMER_KEY = 'U4FR1BKNayGA87LbH4wuDhDunGZrqf8SU5UbcXt2qLeqJiUT'
-MPESA_CONSUMER_SECRET = 'uC3gUvnOFiqpXmS3vR4VM682DjGgmguEfmnagw55J1Se0elGYpjt0KRGxsy8w5n2'
-MPESA_SHORTCODE = 'N/A'  #174379
-MPESA_PASSKEY = 'WpLrDSDget4u2pHNq/U33FAovBqyybu3T0+uNICZgPRygkc72TYcJMhYdU4PEW4gjNPDAPzgk4UFTTM9sMEsuY6OxN2JQ4g08tSkuOV/DhFpxsfz1RbZWOc1haqDU0iA7ADBefz8bQjKnBpFTbNDoKIlURlxNMvBQKfPeUut2E4b2rmtHCQ9UQyiSCQF+j03l5HLrrJ0LO5NvmrP8mT4W7t0hlwSU2emD+HHsBduSm2T8FMHLeCjcgy90XjG5SKVtQ9bO/+PoChyjWlFb9lSB09akcNgsybW2hof+R1f2RFsYq0wwf9JtGTjeCCT6XrH+306VLwi0hcAPcEuWFKCeQ=='
+MPESA_CONSUMER_KEY = 'f005bZS0zNCR6uvH2CQ8PMDpAQysRlpDCBA4Y4YKjaJ6TDzY'
+MPESA_CONSUMER_SECRET = 'XD0bH0OyzlF6pT99j9Ao8x0RYEIoEziyXArbGcWHjmTROwVGGBhPybG5iCFpruLi'
+MPESA_SHORTCODE = '174379'  
+MPESA_PASSKEY = 'mBIhoeGZREI468D2y/EaY81Reh+Jbgs+ZtPxH2lPyY24sxXTopY4G0HoQtEB+18f3yTUk5vE7qGmyqrNkly5kBfF52Ey9JHZymCJaSSb5qIsOwobNS1g45knm8Ocu4CtqRiVeuFHeSDKl+ZA5yxTq3wKNqT51fHD8JcGYDkZkGUy//M+qgaIwgPBmX/CD7G+NHvgH/pAplh+sAn+fVjEnSr+hT6AVcgejSW/3c+uXMWaOwqC5wiVsluNU8zqHP6pYDwIHkQV2tKSnSQ0EsgBRDuy/PuS74RrpFxqVvJMgtCp3yMyham6bTUjZH+dBAA/R/OZwTM6xbRzxuyrmEXSpw=='
 MPESA_CALLBACK_URL = 'https://127.0.0.1/mpesa/callback/'
+
+# Define the base URL for the MPESA API
+MPESA_BASE_URL = 'https://sandbox.safaricom.co.ke'
+
+# Example: Generate M-Pesa access token and use it for STK Push
+def get_mpesa_access_token():
+    url = f"{MPESA_BASE_URL}/oauth/v1/generate?grant_type=client_credentials"
+    response = requests.get(url, auth=HTTPBasicAuth(MPESA_CONSUMER_KEY, MPESA_CONSUMER_SECRET))
+    access_token = response.json().get('access_token')
+    return access_token
+
+def make_stk_push():
+    access_token = get_mpesa_access_token()
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        # ... your STK Push payload here ...
+    }
+    url = f"{MPESA_BASE_URL}/mpesa/stkpush/v1/processrequest"
+    response = requests.post(url, json=payload, headers=headers)
+    return response.json()

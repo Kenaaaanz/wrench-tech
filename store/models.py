@@ -69,16 +69,14 @@ class Cart(models.Model):
         return self.quantity * self.product.price
 
 
-STATUS_CHOICES = (
-    ('Pending', 'Pending'),
-    ('Accepted', 'Accepted'),
-    ('Packed', 'Packed'),
-    ('On The Way', 'On The Way'),
-    ('Delivered', 'Delivered'),
-    ('Cancelled', 'Cancelled')
-)
-
 class Order(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('processing', 'Processing'),
+        ('shipped', 'Shipped'),
+        ('delivered', 'Delivered'),
+        ('cancelled', 'Cancelled'),
+    ]
     user = models.ForeignKey(User, verbose_name="User", on_delete=models.CASCADE)
     address = models.ForeignKey(Address, verbose_name="Shipping Address", on_delete=models.CASCADE)
     product = models.ForeignKey(Product, verbose_name="Product", on_delete=models.CASCADE)
@@ -89,12 +87,27 @@ class Order(models.Model):
         max_length=50,
         default="Pending"
         )
+
+
 class Vendor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='vendor_profile')
     store_name = models.CharField(max_length=100)
     store_description = models.TextField(blank=True)
     logo = models.ImageField(upload_to='vendor_logos', blank=True, null=True)
     is_approved = models.BooleanField(default=True)
+
+    SHIPPING_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('processing', 'Processing'),
+        ('shipped', 'Shipped'),
+        ('delivered', 'Delivered'),
+        ('cancelled', 'Cancelled'),
+    ]
+    shipping_status = models.CharField(
+        max_length=20,
+        choices=SHIPPING_STATUS_CHOICES,
+        default='pending'
+    )
 
     def __str__(self):
         return self.store_name

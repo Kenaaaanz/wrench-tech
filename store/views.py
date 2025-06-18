@@ -2,7 +2,7 @@ import django
 from django.contrib.auth.models import User
 from store.models import Address, Cart, Category, Order, Product, Vendor
 from django.shortcuts import redirect, render, get_object_or_404
-from .forms import RegistrationForm, AddressForm, VendorRegistrationForm, ProductForm
+from .forms import RegistrationForm, AddressForm, VendorRegistrationForm, ProductForm, VendorShippingStatusForm
 from django.contrib import messages
 from django.views import View
 import decimal
@@ -16,6 +16,17 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from store.mpesa_utils import generate_timestamp, generate_password
+from .models import Address, Cart, Order
+from django.utils import timezone
+from django.db.models import Sum
+from django.db.models.functions import TruncDay, TruncWeek, TruncMonth, TruncYear
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+
+
+
 
 
 
@@ -188,15 +199,20 @@ def minus_cart(request, cart_id):
 def checkout(request):
     user = request.user
     address_id = request.GET.get('address')
-    
-    address = get_object_or_404(Address, id=address_id)
-    # Get all the products of User in Cart
-    cart = Cart.objects.filter(user=user)
-    for c in cart:
-        # Saving all the products from Cart to Order
-        Order(user=user, address=address, product=c.product, quantity=c.quantity).save()
-        # And Deleting from Cart
-        c.delete()
+    if not address_id:
+        # Optionally, handle missing address_id (redirect or show error)
+        return redirect('store:cart')  # or your cart page
+
+    address = get_object_or_404(Address, id=address_id, user=user)
+    cart_items = Cart.objects.filter(user=user)
+    for item in cart_items:
+        Order.objects.create(
+            user=user,
+            address=address,
+            product=item.product,
+            quantity=item.quantity
+        )
+        item.delete()
     return redirect('store:orders')
 
 
@@ -241,15 +257,26 @@ def vendor_dashboard(request):
     try:
         vendor = request.user.vendor_profile
     except Vendor.DoesNotExist:
-         return redirect('store:vendor_register')
+        return redirect('store:vendor_register')
 
     products = Product.objects.filter(vendor=vendor)
     orders = Order.objects.filter(product__vendor=vendor).select_related('product', 'user')
+
+    # Calculate today's earnings
+    today = timezone.now().date()
+    todays_earnings = (
+        Order.objects.filter(
+            product__vendor=vendor,
+            ordered_date__date=today
+        ).aggregate(total=Sum('product__price'))
+    )
+    total_today = todays_earnings['total'] or 0
 
     return render(request, 'store/vendor_dashboard.html', {
         'vendor': vendor,
         'products': products,
         'orders': orders,
+        'total_today': total_today,
     })
 
 @login_required
@@ -300,9 +327,10 @@ def vendor_update_order_status(request, pk):
     order = get_object_or_404(Order, pk=pk, product__vendor=vendor)
     if request.method == 'POST':
         status = request.POST.get('status')
-        order.status = status
-        order.save()
-        return redirect('vendor_dashboard')
+        if status in dict(Order.STATUS_CHOICES):
+            order.status = status
+            order.save()
+        return redirect(request.META.get('HTTP_REFERER', '/'))
     return render(request, 'store/vendor_update_order_status.html', {'order': order})
 
 @login_required
@@ -310,6 +338,17 @@ def vendor_orders(request):
     vendor = request.user.vendor_profile
     orders = Order.objects.filter(product__vendor=vendor).select_related('product', 'user')
     return render(request, 'store/vendor_orders.html', {'orders': orders})
+
+def vendor_detail(request, vendor_id):
+    vendor = get_object_or_404(Vendor, id=vendor_id)
+    if request.method == 'POST':
+        form = VendorShippingStatusForm(request.POST, instance=vendor)
+        if form.is_valid():
+            form.save()
+            return redirect('vendor_detail', vendor_id=vendor.id)
+    else:
+        form = VendorShippingStatusForm(instance=vendor)
+    return render(request, 'vendor_detail.html', {'vendor': vendor, 'form': form})
 
 def debug_template(request):
     try:
@@ -353,6 +392,84 @@ def mpesa_stk_push(request):
         print("STK Push API Response:", response.text)  # Log the full response
         return JsonResponse(response.json())
     return JsonResponse({"error": "Invalid request"}, status=400)
+
+@csrf_exempt
+def mpesa_callback(request):
+    # Handle the callback data here
+    # For now, just return a simple response
+    return HttpResponse("MPESA callback received", status=200)
+
+@login_required
+def vendor_stats(request):
+    vendor = request.user.vendor_profile
+
+    # Daily
+    daily = (
+        Order.objects.filter(product__vendor=vendor)
+        .annotate(period=TruncDay('ordered_date'))
+        .values('period')
+        .annotate(total=Sum('product__price'))
+        .order_by('period')
+    )
+
+    # Weekly
+    weekly = (
+        Order.objects.filter(product__vendor=vendor)
+        .annotate(period=TruncWeek('ordered_date'))
+        .values('period')
+        .annotate(total=Sum('product__price'))
+        .order_by('period')
+    )
+
+    # Monthly
+    monthly = (
+        Order.objects.filter(product__vendor=vendor)
+        .annotate(period=TruncMonth('ordered_date'))
+        .values('period')
+        .annotate(total=Sum('product__price'))
+        .order_by('period')
+    )
+
+    # Yearly
+    yearly = (
+        Order.objects.filter(product__vendor=vendor)
+        .annotate(period=TruncYear('ordered_date'))
+        .values('period')
+        .annotate(total=Sum('product__price'))
+        .order_by('period')
+    )
+
+    context = {
+        'daily': list(daily),
+        'weekly': list(weekly),
+        'monthly': list(monthly),
+        'yearly': list(yearly),
+    }
+    return render(request, 'store/vendor_stats.html', context)
+
+@login_required
+def vendor_detailed_stats(request):
+    vendor = request.user.vendor_profile
+    # Query for detailed stats and transaction history
+    # Example: orders = Order.objects.filter(product__vendor=vendor).select_related('product')
+    return render(request, 'store/vendor_detailed_stats.html', {
+        'vendor': vendor,
+        # 'orders': orders,
+        # Add more context as needed
+    })
+
+
+@login_required
+@require_POST
+def vendor_update_order_status_ajax(request, pk):
+    vendor = request.user.vendor_profile
+    order = get_object_or_404(Order, pk=pk, product__vendor=vendor)
+    status = request.POST.get('status')
+    if status in dict(Order.STATUS_CHOICES):
+        order.status = status
+        order.save()
+        return JsonResponse({'success': True, 'new_status': order.get_status_display()})
+    return JsonResponse({'success': False, 'error': 'Invalid status'})
 
 
 

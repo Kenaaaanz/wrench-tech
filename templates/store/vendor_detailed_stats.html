@@ -1,0 +1,109 @@
+{# filepath: store/templates/store/vendor_detailed_stats.html #}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vendor Detailed Performance & Transactions</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/vendor_styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { background: #f8f9fa; }
+        .summary-card { background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); padding: 24px; margin-bottom: 30px; }
+        .table thead th { background: #343a40; color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="d-flex justify-content-end mb-3">
+            <a href="{% url 'store:vendor_stats' %}" class="btn btn-outline-primary mr-2">Back to Sales Stats</a>
+            <a href="{% url 'store:vendor_dashboard' %}" class="btn btn-secondary">Dashboard</a>
+        </div>
+
+        <h2 class="mb-4">Detailed Performance & Transaction History</h2>
+
+        <!-- Summary Section -->
+        <div class="row">
+            <div class="col-md-4 summary-card text-center">
+                <h5>Total Sales</h5>
+                <p class="display-4">Ksh {{ total_sales|default:"0" }}</p>
+            </div>
+            <div class="col-md-4 summary-card text-center">
+                <h5>Orders</h5>
+                <p class="display-4">{{ total_orders|default:"0" }}</p>
+            </div>
+            <div class="col-md-4 summary-card text-center">
+                <h5>Average Order Value</h5>
+                <p class="display-4">Ksh {{ avg_order_value|default:"0" }}</p>
+            </div>
+        </div>
+
+        <!-- Performance Chart -->
+        <div class="summary-card">
+            <h5>Sales Performance (Last 30 Days)</h5>
+            <canvas id="performanceChart" height="100"></canvas>
+        </div>
+
+        <!-- Transaction History Table -->
+        <div class="summary-card">
+            <h5>Transaction History</h5>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Order ID</th>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Buyer</th>
+                            <th>Status</th>
+                            <th>Total (Ksh)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td>{{ order.ordered_date|date:"Y-m-d H:i" }}</td>
+                            <td>{{ order.id }}</td>
+                            <td>{{ order.product.title }}</td>
+                            <td>{{ order.quantity }}</td>
+                            <td>{{ order.user.username }}</td>
+                            <td>{{ order.status }}</td>
+                            <td>{{ order.product.price|floatformat:2 }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center">No transactions found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data for performance chart (passed from view)
+        const chartLabels = {{ chart_labels|safe }};
+        const chartData = {{ chart_data|safe }};
+
+        new Chart(document.getElementById('performanceChart'), {
+            type: 'line',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    label: 'Daily Sales (Ksh)',
+                    data: chartData,
+                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0,123,255,0.1)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: { responsive: true }
+        });
+    </script>
+</body>
+</html>

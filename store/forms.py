@@ -100,3 +100,8 @@ class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
         exclude = ['vendor', 'created_at', 'updated_at']
+
+class VendorShippingStatusForm(forms.ModelForm):
+    class Meta:
+        model = Vendor
+        fields = ['shipping_status']
