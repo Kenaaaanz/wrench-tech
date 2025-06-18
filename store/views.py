@@ -1,5 +1,3 @@
-import django
-from django.contrib.auth.models import User
 from store.models import Address, Cart, Category, Order, Product, Vendor
 from django.shortcuts import redirect, render, get_object_or_404
 from .forms import RegistrationForm, AddressForm, VendorRegistrationForm, ProductForm, VendorShippingStatusForm

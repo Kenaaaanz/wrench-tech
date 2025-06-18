@@ -4,8 +4,13 @@
     <div class="container mt-5">
         <h2>Welcome, {{ vendor.store_name }}</h2>
         <hr>
+        <p><strong>Today's Earnings:</strong> Ksh {{ total_today }}</p>
         <h4>Your Products</h4>
         <a href="{% url 'store:vendor_add_product' %}" class="btn btn-success btn-sm mb-2">Add Product</a>
+        <div class="d-flex justify-content-end mb-3">
+            <a href="{% url 'store:vendor_stats' %}" class="btn btn-primary">Sales Stats</a>
+            <a href="{% url 'store:vendor_detailed_stats' %}" class="btn btn-outline-secondary">Detailed Performance & Transactions</a>
+        </div>
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -57,7 +62,10 @@
                 <td>{{ order.product.title }}</td>
                 <td>{{ order.user.username }}</td>
                 <td>{{ order.quantity }}</td>
-                <td>{{ order.status }}</td>
+                <td>
+                  <select class="form-control status-dropdown" data-order-id="{{ order.id }}">
+                    {% for key, value in order.STATUS_CHOICES %}
+                      <option value="{{ key }}" {% if order.status == key %}selected{% endif %}>{{ value }}</option>
                     {% endfor %}
                   </select>
                   <span class="status-update-msg text-success small"></span>
