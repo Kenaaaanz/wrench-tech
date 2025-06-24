@@ -1,14 +1,3 @@
-# Django Simple E-Commerce Website with Payment
-This is a simple e-commerce website built with Django (Python) and PayPal is added as payment processor.
-
-I've made this as a "Jewelry Shop" website but you can make any website you like.
-
-
-[Project Demo on YouTube](https://www.youtube.com/watch?v=7IQwbIYfkNI "Django Simple E-Commerce Website")
-
-
-And if you like this project then ADD a STAR ⭐️  to this project 👆
-
 ## Features of this Project
 
 ### A. Admin Users Can
@@ -31,6 +20,12 @@ And if you like this project then ADD a STAR ⭐️  to this project 👆
 6. Update Profile 
 7. Change Password
 8. Reset Password
+
+## D. Vendors can
+1. Manage Products (Add, Update, Filter and Delete)
+2. Manage Orders (View and Process)
+3. View their Shop's stats and detailed stats
+4. View previous transactions
 
 
 ## Support Developer
