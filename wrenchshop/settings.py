@@ -13,13 +13,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-3%y3laftm62q0zaj+s7#p-xqq9(&#q+)s8)p-&#&bz*0$!xu$0'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'fallback-secret-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = ['wrenchas.onrender.com']
-#CSRF_TRUSTED_ORIGINS = ['https://wrenchshop.onrender.com']
+CSRF_TRUSTED_ORIGINS = ['https://wrenchshop.onrender.com']
 
 
 # Application definition
@@ -150,11 +150,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-MPESA_CONSUMER_KEY = 'f005bZS0zNCR6uvH2CQ8PMDpAQysRlpDCBA4Y4YKjaJ6TDzY'
-MPESA_CONSUMER_SECRET = 'XD0bH0OyzlF6pT99j9Ao8x0RYEIoEziyXArbGcWHjmTROwVGGBhPybG5iCFpruLi'
-MPESA_SHORTCODE = '174379'  
-MPESA_PASSKEY = 'mBIhoeGZREI468D2y/EaY81Reh+Jbgs+ZtPxH2lPyY24sxXTopY4G0HoQtEB+18f3yTUk5vE7qGmyqrNkly5kBfF52Ey9JHZymCJaSSb5qIsOwobNS1g45knm8Ocu4CtqRiVeuFHeSDKl+ZA5yxTq3wKNqT51fHD8JcGYDkZkGUy//M+qgaIwgPBmX/CD7G+NHvgH/pAplh+sAn+fVjEnSr+hT6AVcgejSW/3c+uXMWaOwqC5wiVsluNU8zqHP6pYDwIHkQV2tKSnSQ0EsgBRDuy/PuS74RrpFxqVvJMgtCp3yMyham6bTUjZH+dBAA/R/OZwTM6xbRzxuyrmEXSpw=='
-MPESA_CALLBACK_URL = 'https://127.0.0.1/mpesa/callback/'
+MPESA_CONSUMER_KEY = os.environ.get('MPESA_CONSUMER_KEY', 'your-default-consumer-key')
+MPESA_CONSUMER_SECRET = os.environ.get('MPESA_CONSUMER_SECRET', 'your-default-consumer-secret')
+MPESA_SHORTCODE = os.environ.get('MPESA_SHORTCODE', 'your-default-shortcode')
+MPESA_PASSKEY = os.environ.get('MPESA_PASSKEY', 'your-default-passkey')
+MPESA_CALLBACK_URL = os.environ.get('MPESA_CALLBACK_URL', 'https://yourdomain.com/mpesa/callback/')
 
 # Define the base URL for the MPESA API
 MPESA_BASE_URL = 'https://sandbox.safaricom.co.ke'
