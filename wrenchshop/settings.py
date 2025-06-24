@@ -3,6 +3,7 @@ from pathlib import Path
 import os
 import requests
 from requests.auth import HTTPBasicAuth
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -15,10 +16,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-3%y3laftm62q0zaj+s7#p-xqq9(&#q+)s8)p-&#&bz*0$!xu$0'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-
+ALLOWED_HOSTS = ['wrenchas.onrender.com']
 #CSRF_TRUSTED_ORIGINS = ['https://wrenchshop.onrender.com']
 
 
@@ -81,16 +81,19 @@ DATABASES = {
         #'ENGINE': 'django.db.backends.sqlite3',
         #'NAME': BASE_DIR / 'db.sqlite3',
 
-     'default': {
+     #'default': {
          #'ENGINE': 'django.db.backends.sqlite3',
          #'NAME': BASE_DIR / 'db.sqlite3',
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "wrench-tech",
-        "USER": "postgres",
-        "PASSWORD": "Ken@4427",
-        "HOST": "localhost",
-        "PORT": "5432",
-
+        #"ENGINE": "django.db.backends.postgresql",
+        #"NAME": "wrench-tech",
+        #"USER": "railway",
+        #"PASSWORD": "XlcjJaJaCrzXtMFFLlZYPYdOxMkijLgq@4427",
+        #"HOST": "switchyard.proxy.rlwy.net",
+        #"PORT": "49699",
+    'default': {
+        'default': dj_database_url.config(
+        default=os.environ.get('postgresql://postgres:XlcjJaJaCrzXtMFFLlZYPYdOxMkijLgq@switchyard.proxy.rlwy.net:49699/railway')
+    )
 
     }
 }
@@ -156,7 +159,7 @@ MPESA_CALLBACK_URL = 'https://127.0.0.1/mpesa/callback/'
 # Define the base URL for the MPESA API
 MPESA_BASE_URL = 'https://sandbox.safaricom.co.ke'
 
-# Example: Generate M-Pesa access token and use it for STK Push
+#Generate M-Pesa access token and use it for STK Push
 def get_mpesa_access_token():
     url = f"{MPESA_BASE_URL}/oauth/v1/generate?grant_type=client_credentials"
     response = requests.get(url, auth=HTTPBasicAuth(MPESA_CONSUMER_KEY, MPESA_CONSUMER_SECRET))

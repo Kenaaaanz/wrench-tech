@@ -2,6 +2,10 @@
 {% block content %}
 <div class="vendor-dashboard-container">
     <div class="container mt-5">
+      <div class="d-flex justify-content-end mb-3">
+          <a href="{% url 'store:vendor_stats' %}" class="btn btn-primary mr-2">Sales Stats</a>
+          <a href="{% url 'store:vendor_detailed_stats' %}" class="btn btn-outline-secondary">Detailed Stats</a>
+      </div>
         <h2>Welcome, {{ vendor.store_name }}</h2>
         <hr>
         <h4>Your Products</h4>
@@ -57,10 +61,13 @@
                 <td>{{ order.product.title }}</td>
                 <td>{{ order.user.username }}</td>
                 <td>{{ order.quantity }}</td>
-                <td>{{ order.status }}</td>
-                    {% endfor %}
-                  </select>
-                  <span class="status-update-msg text-success small"></span>
+                <td>
+                    <select class="form-control status-dropdown" data-order-id="{{ order.id }}">
+                        {% for key, value in order.STATUS_CHOICES %}
+                            <option value="{{ key }}" {% if order.status == key %}selected{% endif %}>{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                    <span class="status-update-msg text-success small"></span>
                 </td>
                 <td>{{ order.ordered_date|date:"Y-m-d H:i" }}</td>
             </tr>

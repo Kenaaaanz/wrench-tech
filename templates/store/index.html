@@ -6,7 +6,7 @@
       <!-- HERO SECTION-->
       <style>
         .hero-bg {
-          background: url("{% static 'banner.jpg' %}");
+          background: url("{% static 'img/banner.jpg' %}");
           background-size: cover;
           background-position: center;
         }
@@ -90,8 +90,10 @@
                         </ul>
                       </div>
                     </div>
-                    <h6> <a class="reset-anchor" href="detail.html">{{ product.title }}</a></h6>
-                                        <!-- Inside your product loop -->
+                        <h6>
+                          <a class="reset-anchor" href="{% url 'store:product-detail' product.slug %}">{{ product.title }}</a>
+                        </h6>                  
+                         <!-- Inside your product loop -->
                         <div class="vendor-info mt-2">
                             <small>
                                 Sold by: <strong>{{ product.vendor.store_name }}</strong>
