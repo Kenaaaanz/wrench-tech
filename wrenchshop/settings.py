@@ -75,27 +75,11 @@ WSGI_APPLICATION = 'wrenchshop.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
-DATABASES = {
-    #'default': {
-        #'ENGINE': 'django.db.backends.sqlite3',
-        #'NAME': BASE_DIR / 'db.sqlite3',
-
-     #'default': {
-         #'ENGINE': 'django.db.backends.sqlite3',
-         #'NAME': BASE_DIR / 'db.sqlite3',
-        #"ENGINE": "django.db.backends.postgresql",
-        #"NAME": "wrench-tech",
-        #"USER": "railway",
-        #"PASSWORD": "XlcjJaJaCrzXtMFFLlZYPYdOxMkijLgq@4427",
-        #"HOST": "switchyard.proxy.rlwy.net",
-        #"PORT": "49699",
-    'default': {
-        'default': dj_database_url.config(
-        default=os.environ.get('postgresql://postgres:XlcjJaJaCrzXtMFFLlZYPYdOxMkijLgq@switchyard.proxy.rlwy.net:49699/railway')
+  DATABASES = {
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL')
     )
-
-    }
+}
 }
 
 
