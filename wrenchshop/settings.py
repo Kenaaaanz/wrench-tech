@@ -162,10 +162,3 @@ def make_stk_push():
     url = f"{MPESA_BASE_URL}/mpesa/stkpush/v1/processrequest"
     response = requests.post(url, json=payload, headers=headers)
     return response.json()
-
-
-from django.contrib.auth import get_user_model
-
-User = get_user_model()
-if not User.objects.filter(username='admin').exists():
-    User.objects.create_superuser('admin', 'admin@example.com', 'yourpassword123')
