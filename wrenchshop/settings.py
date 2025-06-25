@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'whitenoise',
     'mpesa',
     'mpesa_api',
+    'cloudinary',
+    'cloudinary_storage',
 ]
 
 MIDDLEWARE = [
@@ -162,3 +164,13 @@ def make_stk_push():
     url = f"{MPESA_BASE_URL}/mpesa/stkpush/v1/processrequest"
     response = requests.post(url, json=payload, headers=headers)
     return response.json()
+
+# Cloudinary settings
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
